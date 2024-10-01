@@ -2,6 +2,8 @@ import express from 'express';
 import bookingRouter from './controllers/booking';
 const app = express();
 
+app.use(express.json());
+
 app.get('/', (_, res) => {
     res.send('<h1>Hello world!</h1>');
 })

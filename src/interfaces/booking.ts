@@ -1,4 +1,4 @@
-enum BookingStatus {
+export enum BookingStatus {
     Pending = "Pending", Booked = "Booked", Cancelled = "Cancelled", Refund = "Refund"
 }
 export interface Booking {
@@ -13,3 +13,5 @@ export interface Booking {
     "roomId": number,
     "status": BookingStatus
 }
+
+export type BookingInput = Omit<Booking, 'id'>;
