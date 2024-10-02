@@ -1,39 +1,39 @@
 import express from 'express';
-import * as bookingService from '../services/bookings';
+import * as contactService from '../services/contacts';
 import authMiddleware from '../middleware/auth';
 
 const router = express.Router();
 
 router.get('/', authMiddleware, (_, res) => {
-    const bookings = bookingService.getAll();
-    res.send(bookings);
+    const contacts = contactService.getAll();
+    res.send(contacts);
 });
 
 router.get('/:id', authMiddleware, (req, res) => {
-    const booking = bookingService.getByID(+req.params.id);
-    if (booking) {
-        res.status(200).send(booking);
+    const contact = contactService.getByID(+req.params.id);
+    if (contact) {
+        res.status(200).send(contact);
     } else {
         res.status(404).send({ message: 'Booking not found' });
     }
 });
 
 router.post('/', authMiddleware, (req, res) => {
-    const newBooking = bookingService.create(req.body);
-    res.status(201).send(newBooking);
+    const newcontact = contactService.create(req.body);
+    res.status(201).send(newcontact);
 });
 
 router.put('/:id', authMiddleware, (req, res) => {
-    const updatedBooking = bookingService.update(+req.params.id, req.body);
-    if (updatedBooking) {
-        res.status(200).send(updatedBooking);
+    const updatecontact = contactService.update(+req.params.id, req.body);
+    if (updatecontact) {
+        res.status(200).send(updatecontact);
     } else {
         res.status(404).send({ message: 'Booking not found' });
     }
 });
 
 router.delete('/:id', authMiddleware, (req, res) => {
-    const deleted = bookingService.remove(+req.params.id);
+    const deleted = contactService.remove(+req.params.id);
     if (deleted) {
         res.status(204).send();
     } else {

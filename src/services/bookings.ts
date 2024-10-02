@@ -3,7 +3,7 @@ import { Booking, BookingInput } from '../interfaces/booking';
 
 const bookings : Booking[] = data as Booking[];
 
-export const getAllBookings = () => bookings;
+export const getAll = () => bookings;
 
 export const getByID = (id: number) => bookings.find(b => b.id === id);
 

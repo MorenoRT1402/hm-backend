@@ -1,9 +1,9 @@
-export interface User {
+export interface AppUser {
     username: string,
     password: string
 }
 
-export const hardcodedUser : User = {
+export const hardcodedUser : AppUser = {
     username: 'admin',
     password: '1234'
 }

@@ -14,3 +14,5 @@ export interface User {
     "status": UserStatus,
     "password": string,
 }
+
+export type UserInput = Omit<User, 'id'>;

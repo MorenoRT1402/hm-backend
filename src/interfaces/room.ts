@@ -15,3 +15,5 @@ export interface Room {
     "discount": number,
     "status": RoomStatus
 }
+
+export type RoomInput = Omit<Room, 'id'>;

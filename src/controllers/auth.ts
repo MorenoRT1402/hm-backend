@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { hardcodedUser } from '../app/hardcodedUser';
 import { configDotenv } from 'dotenv';
+import { saveToken } from '../utils/localPersistence';
 configDotenv();
 
 const router = express.Router();
@@ -25,6 +26,7 @@ router.post('/', (req, res) : any => {
     });
 
     req.headers.authorization = `Bearer ${token}`;
+    saveToken(token, res);
     res.json({ token });
 });
 

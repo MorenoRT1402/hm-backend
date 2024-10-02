@@ -8,3 +8,5 @@ export interface Contact {
     "comment": string,
     "archived": boolean
 }
+
+export type ContactInput = Omit<Contact, 'id'>;
