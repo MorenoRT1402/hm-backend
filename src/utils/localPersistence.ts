@@ -12,3 +12,10 @@ export const saveToken = (token:string, res:Response):void => {
 }
 
 export const getToken = (req:Request):string|null => req.cookies[tokenKey];
+
+export const deleteToken = (res:Response) => {
+    res.clearCookie(tokenKey, {
+    httpOnly: true,
+    sameSite: 'strict',
+  });
+}

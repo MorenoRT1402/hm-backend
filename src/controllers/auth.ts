@@ -2,16 +2,16 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { hardcodedUser } from '../app/hardcodedUser';
 import { configDotenv } from 'dotenv';
-import { saveToken } from '../utils/localPersistence';
+import { deleteToken, saveToken } from '../utils/localPersistence';
 configDotenv();
 
 const router = express.Router();
 
-router.get('/', (_, res) => {
+router.get('/login', (_, res) => {
     res.send('In Login Page');
 })
 
-router.post('/', (req, res) : any => {
+router.post('/login', (req, res) : any => {
     const { username, password } = req.body;
 
     const user = username === hardcodedUser.username;
@@ -29,5 +29,10 @@ router.post('/', (req, res) : any => {
     saveToken(token, res);
     res.json({ token });
 });
+
+router.post('/logout', (_, res) => {
+    deleteToken(res);
+    res.status(200).send('logout');
+})
 
 export default router;

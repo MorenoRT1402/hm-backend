@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/login', authRouter);
+app.use('/auth', authRouter);
 app.use('/bookings', bookingRouter);
 app.use('/rooms', roomRouter);
 app.use('/users', userRouter);
