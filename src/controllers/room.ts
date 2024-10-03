@@ -1,14 +1,70 @@
 import express from 'express';
-import * as roomService from '../services/rooms';
+import RoomService from '../services/rooms';
 import authMiddleware from '../middleware/auth';
 
 const router = express.Router();
 
+const roomService = new RoomService();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Rooms
+ *   description: API for managing rooms
+ */
+
+/**
+ * @swagger
+ * /rooms:
+ *   get:
+ *     tags: [Rooms]
+ *     summary: Retrieve all rooms
+ *     description: Get a list of all rooms
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of rooms
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Room'
+ *       401:
+ *         description: Unauthorized
+ */
 router.get('/', authMiddleware, (_, res) => {
     const rooms = roomService.getAll();
     res.send(rooms);
 });
 
+/**
+ * @swagger
+ * /rooms/{id}:
+ *   get:
+ *     tags: [Rooms]
+ *     summary: Retrieve a room by ID
+ *     description: Get a single room by its ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the room to retrieve
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A single room object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Room'
+ *       404:
+ *         description: Room not found
+ */
 router.get('/:id', authMiddleware, (req, res) => {
     const room = roomService.getByID(+req.params.id);
     if (room) {
@@ -18,11 +74,66 @@ router.get('/:id', authMiddleware, (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /rooms:
+ *   post:
+ *     tags: [Rooms]
+ *     summary: Create a new room
+ *     description: Create a new room with the provided details
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RoomInput'
+ *     responses:
+ *       201:
+ *         description: The created room object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Room'
+ */
 router.post('/', authMiddleware, (req, res) => {
     const newRoom = roomService.create(req.body);
     res.status(201).send(newRoom);
 });
 
+/**
+ * @swagger
+ * /rooms/{id}:
+ *   put:
+ *     tags: [Rooms]
+ *     summary: Update a room by ID
+ *     description: Update the details of an existing room
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the room to update
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RoomInput'
+ *     responses:
+ *       200:
+ *         description: The updated room object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Room'
+ *       404:
+ *         description: Room not found
+ */
 router.put('/:id', authMiddleware, (req, res) => {
     const updateRoom = roomService.update(+req.params.id, req.body);
     if (updateRoom) {
@@ -32,6 +143,28 @@ router.put('/:id', authMiddleware, (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /rooms/{id}:
+ *   delete:
+ *     tags: [Rooms]
+ *     summary: Delete a room by ID
+ *     description: Remove a room from the database
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the room to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Room deleted successfully
+ *       404:
+ *         description: Room not found
+ */
 router.delete('/:id', authMiddleware, (req, res) => {
     const deleted = roomService.remove(+req.params.id);
     if (deleted) {
