@@ -6,7 +6,7 @@ import bookingRouter from './controllers/booking';
 import roomRouter from './controllers/room';
 import userRouter from './controllers/user';
 import contactRouter from './controllers/contact';
-import { swaggerSetup } from './swagger'; // Asegúrate de que esta ruta sea correcta
+import { swaggerSetup } from './documentation/swagger';
 
 const app = express();
 
