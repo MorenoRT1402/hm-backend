@@ -166,12 +166,13 @@ router.put('/:id', authMiddleware, (req, res) => {
  *         description: Room not found
  */
 router.delete('/:id', authMiddleware, (req, res) => {
-    const deleted = roomService.remove(+req.params.id);
-    if (deleted) {
-        res.status(204).send();
-    } else {
-        res.status(404).send({ message: 'Room not found' });
-    }
+    roomService.remove(+req.params.id).then(deleted => {
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).send({ message: 'Room not found' });
+        }
+    });
 });
 
 export default router;

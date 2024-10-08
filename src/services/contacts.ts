@@ -1,12 +1,10 @@
-import data from '../data/contact.json';
-import { Contact, ContactInput } from '../interfaces/contact';
+import { ContactModel } from '../db/schemas/contactSchema';
+import { ContactInput } from '../interfaces/contact';
 import { CrudService } from './crud';
 
-const Contacts: Contact[] = data as Contact[];
-
-class ContactService extends CrudService<Contact, ContactInput> {
+class ContactService extends CrudService<ContactInput> {
   constructor() {
-    super(Contacts);
+    super(ContactModel);
   }
 }
 

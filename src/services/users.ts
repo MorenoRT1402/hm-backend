@@ -1,12 +1,11 @@
 import data from '../data/users.json';
-import { User, UserInput } from '../interfaces/user';
+import { UserModel } from '../db/schemas/userSchema';
+import { UserInput } from '../interfaces/user';
 import { CrudService } from './crud';
 
-const rooms: User[] = data as User[];
-
-class UserService extends CrudService<User, UserInput> {
+class UserService extends CrudService<UserInput> {
   constructor() {
-    super(rooms);
+    super(UserModel);
   }
 }
 

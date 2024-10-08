@@ -169,12 +169,13 @@ router.put('/:id', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.delete('/:id', authMiddleware, (req, res) => {
-    const deleted = contactService.remove(+req.params.id);
-    if (deleted) {
-        res.status(204).send();
-    } else {
-        res.status(404).send({ message: 'Contact not found' });
-    }
+    contactService.remove(+req.params.id).then(deleted => {
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).send({ message: 'Contact not found' });
+        }
+    });
 });
 
 export default router;

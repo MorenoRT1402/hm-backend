@@ -168,12 +168,13 @@ router.put('/:id', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.delete('/:id', authMiddleware, (req, res) => {
-    const deleted = userService.remove(+req.params.id);
-    if (deleted) {
-        res.status(204).send();
-    } else {
-        res.status(404).send({ message: 'User not found' });
-    }
+    userService.remove(+req.params.id).then(deleted => {
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).send({ message: 'User not found' });
+        }
+    });
 });
 
 export default router;

@@ -168,13 +168,14 @@ router.put('/:id', authMiddleware, (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.delete('/:id', authMiddleware, (req, res) => {
-    const deleted = bookingService.remove(+req.params.id);
-    if (deleted) {
-        res.status(204).send();
-    } else {
-        res.status(404).send({ message: 'Booking not found' });
-    }
+router.delete('/:id', authMiddleware, async (req, res) => {
+    bookingService.remove(+req.params.id).then(deleted => {
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).send({ message: 'Booking not found' });
+        }
+    });
 });
 
 export default router;

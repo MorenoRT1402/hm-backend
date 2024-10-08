@@ -1,12 +1,10 @@
-import data from '../data/rooms.json';
-import { Room, RoomInput } from '../interfaces/room';
+import { RoomModel } from '../db/schemas/roomSchema';
+import { RoomInput } from '../interfaces/room';
 import { CrudService } from './crud';
 
-const rooms: Room[] = data as Room[];
-
-class RoomService extends CrudService<Room, RoomInput> {
+class RoomService extends CrudService<RoomInput> {
   constructor() {
-    super(rooms);
+    super(RoomModel);
   }
 }
 

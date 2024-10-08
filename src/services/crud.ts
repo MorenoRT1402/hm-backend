@@ -1,44 +1,37 @@
-export class CrudService<T, I> {
-    private data: T[] = [];
-    
-    constructor(initialData: T[]) {
-      this.data = initialData;
+import { Model } from "mongoose";
+
+export class CrudService<T> {
+    private model: Model<T>;
+
+    constructor(model: Model<T>) {
+        this.model = model;
     }
-  
-    getAll(): T[] {
-      return this.data;
+
+    // Obtener todos los elementos
+    async getAll(): Promise<T[]> {
+        return await this.model.find();
     }
-  
-    getByID(id: number): T | undefined {
-      return this.data.find((item) => (item as any).id === id);
+
+    // Obtener por ID
+    async getByID(id: number): Promise<T | null> {
+        return await this.model.findOne({ id }); 
     }
-  
-    create(itemInput: I): T {
-      const newItem = {
-        id: Math.max(...this.data.map((b) => (b as any).id)) + 1,
-        ...itemInput,
-      } as T;
-  
-      this.data.push(newItem);
-      return newItem;
+
+    // Crear un nuevo elemento
+    async create(itemInput: Partial<T>): Promise<T> {
+        const newItem = new this.model(itemInput);
+        await newItem.save();
+        return newItem;
     }
-  
-    update(id: number, updatedItem: I): T | null {
-      const index = this.data.findIndex((item) => (item as any).id === id);
-      if (index !== -1) {
-        this.data[index] = { id, ...updatedItem } as T;
-        return this.data[index];
-      }
-      return null;
+
+    // Actualizar un elemento existente
+    async update(id: number, updatedItem: Partial<T>): Promise<T | null> {
+        return await this.model.findOneAndUpdate({ id }, updatedItem, { new: true });
     }
-  
-    remove(id: number): boolean {
-      const index = this.data.findIndex((item) => (item as any).id === id);
-      if (index !== -1) {
-        this.data.splice(index, 1);
-        return true;
-      }
-      return false;
+
+    // Eliminar un elemento por ID
+    async remove(id: number): Promise<boolean> {
+        const result = await this.model.deleteOne({ id });
+        return result.deletedCount === 1;
     }
-  }
-  
+}

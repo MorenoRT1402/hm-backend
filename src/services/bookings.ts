@@ -1,12 +1,10 @@
-import data from '../data/bookings.json';
-import { Booking, BookingInput } from '../interfaces/booking';
+import { BookingModel } from '../db/schemas/bookingSchema';
+import { BookingInput } from '../interfaces/booking';
 import { CrudService } from './crud';
 
-const Bookings: Booking[] = data as Booking[];
-
-class BookingService extends CrudService<Booking, BookingInput> {
+class BookingService extends CrudService<BookingInput> {
   constructor() {
-    super(Bookings);
+    super(BookingModel);
   }
 }
 
