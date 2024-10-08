@@ -9,12 +9,12 @@ export class CrudService<T> {
 
     // Obtener todos los elementos
     async getAll(): Promise<T[]> {
-        return await this.model.find();
+      return this.model.find().then(models => models);
     }
 
     // Obtener por ID
-    async getByID(id: number): Promise<T | null> {
-        return await this.model.findOne({ id }); 
+    async getByID(id: string): Promise<T | null> {
+      return await this.model.findById(id); 
     }
 
     // Crear un nuevo elemento
@@ -25,13 +25,13 @@ export class CrudService<T> {
     }
 
     // Actualizar un elemento existente
-    async update(id: number, updatedItem: Partial<T>): Promise<T | null> {
-        return await this.model.findOneAndUpdate({ id }, updatedItem, { new: true });
+    async update(id: string, updatedItem: Partial<T>): Promise<T | null> {
+        return await this.model.findOneAndUpdate({_id:id}, updatedItem, { new: true });
     }
 
     // Eliminar un elemento por ID
-    async remove(id: number): Promise<boolean> {
-        const result = await this.model.deleteOne({ id });
+    async remove(id: string): Promise<boolean> {
+        const result = await this.model.deleteOne({ _id:id });
         return result.deletedCount === 1;
     }
 }

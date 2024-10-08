@@ -33,8 +33,8 @@ const contactService = new ContactService();
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authMiddleware, (_, res) => {
-    const contacts = contactService.getAll();
+router.get('/', authMiddleware, async (_, res) => {
+    const contacts = await contactService.getAll();
     res.send(contacts);
 });
 
@@ -66,7 +66,7 @@ router.get('/', authMiddleware, (_, res) => {
  *         description: Unauthorized
  */
 router.get('/:id', authMiddleware, (req, res) => {
-    const contact = contactService.getByID(+req.params.id);
+    const contact = contactService.getByID(req.params.id);
     if (contact) {
         res.status(200).send(contact);
     } else {
@@ -98,8 +98,8 @@ router.get('/:id', authMiddleware, (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.post('/', authMiddleware, (req, res) => {
-    const newContact = contactService.create(req.body);
+router.post('/', authMiddleware, async (req, res) => {
+    const newContact = await contactService.create(req.body);
     res.status(201).send(newContact);
 });
 
@@ -137,7 +137,7 @@ router.post('/', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.put('/:id', authMiddleware, (req, res) => {
-    const updatedContact = contactService.update(+req.params.id, req.body);
+    const updatedContact = contactService.update(req.params.id, req.body);
     if (updatedContact) {
         res.status(200).send(updatedContact);
     } else {
@@ -169,7 +169,7 @@ router.put('/:id', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.delete('/:id', authMiddleware, (req, res) => {
-    contactService.remove(+req.params.id).then(deleted => {
+    contactService.remove(req.params.id).then(deleted => {
         if (deleted) {
             res.status(204).send();
         } else {

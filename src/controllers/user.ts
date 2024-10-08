@@ -32,8 +32,8 @@ const userService = new UserService();
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authMiddleware, (_, res) => {
-    const users = userService.getAll();
+router.get('/', authMiddleware, async (_, res) => {
+    const users = await userService.getAll();
     res.send(users);
 });
 
@@ -65,7 +65,7 @@ router.get('/', authMiddleware, (_, res) => {
  *         description: Unauthorized
  */
 router.get('/:id', authMiddleware, (req, res) => {
-    const user = userService.getByID(+req.params.id);
+    const user = userService.getByID(req.params.id);
     if (user) {
         res.status(200).send(user);
     } else {
@@ -97,8 +97,8 @@ router.get('/:id', authMiddleware, (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.post('/', authMiddleware, (req, res) => {
-    const newUser = userService.create(req.body);
+router.post('/', authMiddleware, async (req, res) => {
+    const newUser = await userService.create(req.body);
     res.status(201).send(newUser);
 });
 
@@ -136,7 +136,7 @@ router.post('/', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.put('/:id', authMiddleware, (req, res) => {
-    const updatedUser = userService.update(+req.params.id, req.body);
+    const updatedUser = userService.update(req.params.id, req.body);
     if (updatedUser) {
         res.status(200).send(updatedUser);
     } else {
@@ -168,7 +168,7 @@ router.put('/:id', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.delete('/:id', authMiddleware, (req, res) => {
-    userService.remove(+req.params.id).then(deleted => {
+    userService.remove(req.params.id).then(deleted => {
         if (deleted) {
             res.status(204).send();
         } else {

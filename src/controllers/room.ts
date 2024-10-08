@@ -34,8 +34,8 @@ const roomService = new RoomService();
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authMiddleware, (_, res) => {
-    const rooms = roomService.getAll();
+router.get('/', authMiddleware, async (_, res) => {
+    const rooms = await roomService.getAll();
     res.send(rooms);
 });
 
@@ -65,8 +65,8 @@ router.get('/', authMiddleware, (_, res) => {
  *       404:
  *         description: Room not found
  */
-router.get('/:id', authMiddleware, (req, res) => {
-    const room = roomService.getByID(+req.params.id);
+router.get('/:id', authMiddleware, async (req, res) => {
+    const room = await roomService.getByID(req.params.id);
     if (room) {
         res.status(200).send(room);
     } else {
@@ -97,8 +97,8 @@ router.get('/:id', authMiddleware, (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/Room'
  */
-router.post('/', authMiddleware, (req, res) => {
-    const newRoom = roomService.create(req.body);
+router.post('/', authMiddleware, async (req, res) => {
+    const newRoom = await roomService.create(req.body);
     res.status(201).send(newRoom);
 });
 
@@ -134,8 +134,10 @@ router.post('/', authMiddleware, (req, res) => {
  *       404:
  *         description: Room not found
  */
-router.put('/:id', authMiddleware, (req, res) => {
-    const updateRoom = roomService.update(+req.params.id, req.body);
+router.put('/:id', authMiddleware, async (req, res) => {
+    console.log(req.params.id)
+    const updateRoom = await roomService.update(req.params.id, req.body);
+    console.log(updateRoom);
     if (updateRoom) {
         res.status(200).send(updateRoom);
     } else {
@@ -166,7 +168,7 @@ router.put('/:id', authMiddleware, (req, res) => {
  *         description: Room not found
  */
 router.delete('/:id', authMiddleware, (req, res) => {
-    roomService.remove(+req.params.id).then(deleted => {
+    roomService.remove(req.params.id).then(deleted => {
         if (deleted) {
             res.status(204).send();
         } else {

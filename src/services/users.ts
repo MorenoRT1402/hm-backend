@@ -1,4 +1,3 @@
-import data from '../data/users.json';
 import { UserModel } from '../db/schemas/userSchema';
 import { UserInput } from '../interfaces/user';
 import { CrudService } from './crud';

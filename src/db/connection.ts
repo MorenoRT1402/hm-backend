@@ -7,7 +7,7 @@ const username = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
 const dbName = process.env.DB_NAME;
 
-const connectionString = `mongodb+srv://${username}:${password}@cluster0.h2xrt.mongodb.net/${dbName}`;
+const connectionString = `mongodb+srv://${username}:${password}@cluster0.h2xrt.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 
 export default mongoose.connect(connectionString).then(() =>
     console.log("Database connected")

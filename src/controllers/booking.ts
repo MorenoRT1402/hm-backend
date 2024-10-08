@@ -33,8 +33,8 @@ const bookingService = new BookingService();
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authMiddleware, (_, res) => {
-    const bookings = bookingService.getAll();
+router.get('/', authMiddleware, async (_, res) => {
+    const bookings = await bookingService.getAll();
     res.send(bookings);
 });
 
@@ -66,7 +66,7 @@ router.get('/', authMiddleware, (_, res) => {
  *         description: Unauthorized
  */
 router.get('/:id', authMiddleware, (req, res) => {
-    const booking = bookingService.getByID(+req.params.id);
+    const booking = bookingService.getByID(req.params.id);
     if (booking) {
         res.status(200).send(booking);
     } else {
@@ -98,8 +98,8 @@ router.get('/:id', authMiddleware, (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.post('/', authMiddleware, (req, res) => {
-    const newBooking = bookingService.create(req.body);
+router.post('/', authMiddleware, async (req, res) => {
+    const newBooking = await bookingService.create(req.body);
     res.status(201).send(newBooking);
 });
 
@@ -137,7 +137,7 @@ router.post('/', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.put('/:id', authMiddleware, (req, res) => {
-    const updatedBooking = bookingService.update(+req.params.id, req.body);
+    const updatedBooking = bookingService.update(req.params.id, req.body);
     if (updatedBooking) {
         res.status(200).send(updatedBooking);
     } else {
@@ -169,7 +169,7 @@ router.put('/:id', authMiddleware, (req, res) => {
  *         description: Unauthorized
  */
 router.delete('/:id', authMiddleware, async (req, res) => {
-    bookingService.remove(+req.params.id).then(deleted => {
+    bookingService.remove(req.params.id).then(deleted => {
         if (deleted) {
             res.status(204).send();
         } else {
