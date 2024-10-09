@@ -1,4 +1,4 @@
-enum RoomStatus {
+export enum RoomStatus {
     Available = "Available", Booked = "Booked"
 }
 export interface Room {

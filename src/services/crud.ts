@@ -8,7 +8,7 @@ export class CrudService<T> {
     }
 
     async getAll(): Promise<T[]> {
-      return this.model.find().then(models => models);
+      return this.model.find().then((models: T[]) => models);
     }
 
     async getByID(id: string): Promise<T | null> {
