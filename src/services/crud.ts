@@ -7,14 +7,16 @@ export class CrudService<T> {
         this.model = model;
     }
 
-    // Obtener todos los elementos
     async getAll(): Promise<T[]> {
       return this.model.find().then(models => models);
     }
 
-    // Obtener por ID
     async getByID(id: string): Promise<T | null> {
       return await this.model.findById(id); 
+    }
+
+    async getBy(props : {}): Promise<T | null>{
+        return await this.model.findOne(props);
     }
 
     // Crear un nuevo elemento
