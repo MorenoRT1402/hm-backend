@@ -1,3 +1,4 @@
+// db/connection.ts
 import { configDotenv } from "dotenv";
 import mongoose from "mongoose";
 
@@ -9,6 +10,12 @@ const dbName = process.env.DB_NAME;
 
 const connectionString = `mongodb+srv://${username}:${password}@cluster0.h2xrt.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 
-export default mongoose.connect(connectionString).then(() =>
-    console.log("Database connected")
-).catch(err => console.error(err));
+export const connectToDB = async () => {
+    try {
+        await mongoose.connect(connectionString);
+        console.log("Database connected");
+    } catch (err) {
+        console.error("Database connection error:", err);
+        throw err;
+    }
+};

@@ -1,8 +1,8 @@
 import app from "./app";
-import connectToDB from "./db/connection";
+import { connectToDB } from "./db/connection";
 const PORT = 3000;
 
 app.listen(PORT, () => {
-    connectToDB;
+    connectToDB();
     console.log(`Server running at http://localhost:${PORT}`)
 })

@@ -5,9 +5,9 @@ import { roomParams } from '../../app/hotelParams';
 
 export const fakeRoom = ():RoomInput => {
       return {
-        dateAdded: faker.date.past().toString(),
+        dateAdded: faker.date.past().toUTCString(),
         roomType: `Deluxe ${faker.helpers.arrayElement(roomParams.letters)}`,
-        number: faker.number.int(),
+        number: random.number(roomParams.numbers, 0),
         picture: faker.image.url(),
         bedType: faker.helpers.arrayElement(roomParams.types),
         roomFloor: faker.helpers.arrayElement(roomParams.floors),
