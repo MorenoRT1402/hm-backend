@@ -6,7 +6,7 @@ export const fakeContact = () => {
   const archived = random.boolean();
 
   return {
-  date: faker.date.past(),
+  date: faker.date.past().toUTCString(),
   customer: faker.person.fullName(),
   email: faker.internet.email(),
   phone: faker.phone.number(),

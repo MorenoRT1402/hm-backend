@@ -5,21 +5,35 @@ import { fakeRoom } from "./data/fake/rooms";
 import { connectToDB } from "./db/connection";
 import { ContactModel } from "./db/schemas/contactSchema";
 import { fakeContact } from "./data/fake/contacts";
+import { fakeBooking } from "./data/fake/bookings";
+import { BookingModel } from "./db/schemas/bookingSchema";
 
 const clearCollections = async() => {
     await RoomModel.deleteMany({});
     await ContactModel.deleteMany({});
+    await BookingModel.deleteMany({});
 }
 
-const saveFakeData = async <T>(fakeItem:()=>{}, model:Model<T>) => {
+const saveFakeData = async <T>(fakeItem: () => Promise<T> | T, model: Model<T>) => {
+  const fakeDatas = []
     for (let i = 0; i < GENERATION_NUMBER; i++) {
-        const item = new model(fakeItem());
-        await item.save();
-    }}
+      try {
+        const itemData = await fakeItem();
+        const item = new model(itemData);
+        fakeDatas.push(item);
+      } catch (error) {
+        console.error("Error saving items:", error);
+      }
+    }
+    await model.insertMany(fakeDatas);
+  };
+  
+  
 
 const saveFakeDatas = async() => {
     await saveFakeData(fakeRoom, RoomModel);
     await saveFakeData(fakeContact, ContactModel);
+    await saveFakeData(fakeBooking, BookingModel);
 }
 
 const generateFakeData = async () => {
