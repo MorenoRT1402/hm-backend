@@ -11,7 +11,7 @@ export const fakeUser = () => {
     position: faker.helpers.arrayElement(userParams.positions),
     email: faker.internet.email(),
     contact: faker.phone.number(),
-    joined: faker.date.past(),
+    joined: faker.date.past().toUTCString(),
     jobDesk: faker.helpers.arrayElement(userParams.jobDesks),
     schedule: faker.helpers.arrayElements(userParams.schedules, 2),
     status: faker.helpers.enumValue(UserStatus),
