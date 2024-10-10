@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '../app';
-import { hardcodedUser } from '../app/hardcodedUser';
+import { hardcodedAppUser } from '../app/hardcodedUser';
 
 let cookies: string;
 
@@ -9,7 +9,7 @@ describe('Auth and API Tests', () => {
   beforeAll(async () => {
     const loginRes = await request(app)
       .post('/auth/login')
-      .send(hardcodedUser);
+      .send(hardcodedAppUser);
 
     cookies = loginRes.headers['set-cookie'];
   });

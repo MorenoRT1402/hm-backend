@@ -9,7 +9,7 @@ const BookingSchema = new Schema<BookingInput>({
     checkOut: String,
     discount: Number,
     notes: [String],
-    roomId: Number,
+    room: { type: Schema.Types.ObjectId, ref: 'Room' },
     status: String
 })
 

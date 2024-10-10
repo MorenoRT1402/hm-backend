@@ -7,31 +7,39 @@ export class CrudService<T> {
         this.model = model;
     }
 
-    async getAll(): Promise<T[]> {
-      return this.model.find().then((models: T[]) => models);
+    async getAll(populateFields: string[]=[]): Promise<T[]> {
+        return this.model.find().populate(populateFields.join(' ')).then((models: T[]) => models);
     }
 
-    async getByID(id: string): Promise<T | null> {
-      return await this.model.findById(id); 
+    async getByID(id: string, populateFields: string[]=[]): Promise<T | null> {
+        return await this.model.findById(id).populate(populateFields.join(' '));
     }
 
     async getBy(props : {}): Promise<T | null>{
         return await this.model.findOne(props);
     }
 
-    // Crear un nuevo elemento
+    // Create a new item
     async create(itemInput: Partial<T>): Promise<T> {
         const newItem = new this.model(itemInput);
         await newItem.save();
         return newItem;
     }
 
-    // Actualizar un elemento existente
+    // Update an existing item
     async update(id: string, updatedItem: Partial<T>): Promise<T | null> {
-        return await this.model.findOneAndUpdate({_id:id}, updatedItem, { new: true });
+        return await this.model.findOneAndUpdate(
+            { _id: id }, 
+            updatedItem, 
+            { 
+                new: true, 
+                runValidators: true, 
+                optimisticConcurrency: true //__v ++
+            }
+        );
     }
 
-    // Eliminar un elemento por ID
+    // Delete an item by ID
     async remove(id: string): Promise<boolean> {
         const result = await this.model.deleteOne({ _id:id });
         return result.deletedCount === 1;

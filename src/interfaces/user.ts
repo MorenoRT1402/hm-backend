@@ -1,4 +1,4 @@
-enum UserStatus {
+export enum UserStatus {
     Active = "Active", Inactive = "Inactive"
 }
 export interface User {

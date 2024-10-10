@@ -65,8 +65,8 @@ router.get('/', authMiddleware, async (_, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.get('/:id', authMiddleware, (req, res) => {
-    const booking = bookingService.getByID(req.params.id);
+router.get('/:id', authMiddleware, async (req, res) => {
+    const booking = await bookingService.getByID(req.params.id);
     if (booking) {
         res.status(200).send(booking);
     } else {

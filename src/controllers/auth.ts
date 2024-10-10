@@ -21,7 +21,7 @@ router.post('/login', (req, res) : any => {
         if(user === null || !compare(password, user?.password))
             return res.send('Usuario o contraseña incorrectos').status(401);
         
-        const token = jwt.sign({ username: hardcodedUser.username }, process.env.TOKEN_SECRET_KEY as string, {
+        const token = jwt.sign({ username: hardcodedUser.name }, process.env.TOKEN_SECRET_KEY as string, {
             expiresIn: '1h',
         });
     

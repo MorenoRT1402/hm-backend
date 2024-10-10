@@ -40,7 +40,7 @@ export const BookingSchema = {
         },
         description: 'Notas sobre la reserva',
       },
-      roomId: {
+      room: {
         type: 'integer',
         format: 'int64',
         description: 'ID de la habitación asociada',
@@ -51,6 +51,6 @@ export const BookingSchema = {
         description: 'Estado de la reserva',
       },
     },
-    required: ['id', 'guest', 'orderDate', 'checkIn', 'checkOut', 'roomId', 'status'],
+    required: ['id', 'guest', 'orderDate', 'checkIn', 'checkOut', 'room', 'status'],
   };
   

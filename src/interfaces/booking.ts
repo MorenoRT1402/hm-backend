@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export enum BookingStatus {
     Pending = "Pending", Booked = "Booked", Cancelled = "Cancelled", Refund = "Refund"
 }
@@ -10,7 +12,7 @@ export interface Booking {
     "checkOut": string,
     "discount": number,
     "notes": string[],
-    "roomId": number,
+    "room": Types.ObjectId,
     "status": BookingStatus
 }
 

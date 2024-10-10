@@ -1,18 +1,25 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { RoomModel } from "./db/schemas/roomSchema";
 import { GENERATION_NUMBER } from "./app/testDB";
 import { fakeRoom } from "./data/fake/rooms";
 import { connectToDB } from "./db/connection";
+import { ContactModel } from "./db/schemas/contactSchema";
+import { fakeContact } from "./data/fake/contacts";
 
 const clearCollections = async() => {
     await RoomModel.deleteMany({});
+    await ContactModel.deleteMany({});
 }
 
-const saveFakeDatas = async() => {
+const saveFakeData = async <T>(fakeItem:()=>{}, model:Model<T>) => {
     for (let i = 0; i < GENERATION_NUMBER; i++) {
-        const room = new RoomModel(fakeRoom());
-        await room.save();
-    }
+        const item = new model(fakeItem());
+        await item.save();
+    }}
+
+const saveFakeDatas = async() => {
+    await saveFakeData(fakeRoom, RoomModel);
+    await saveFakeData(fakeContact, ContactModel);
 }
 
 const generateFakeData = async () => {
