@@ -7,9 +7,11 @@ import roomRouter from './controllers/room';
 import userRouter from './controllers/user';
 import contactRouter from './controllers/contact';
 import { swaggerSetup } from './documentation/swagger';
+import cors from 'cors';
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 

@@ -4,8 +4,7 @@ const SALT_ROUND = 10;
 
 export const compare = async (roughPassword: string, hashedPassword: string): Promise<boolean> => {
   try {
-    const isMatch = await bcrypt.compare(roughPassword, hashedPassword);
-    return isMatch;
+    return await bcrypt.compare(roughPassword, hashedPassword);
   } catch (err) {
     console.error('Error al comparar:', err);
     return false;
