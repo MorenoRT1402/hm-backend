@@ -1,11 +1,8 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
-import { hardcodedUser } from '../app/hardcodedUser';
-import { configDotenv } from 'dotenv';
-import { deleteToken, saveToken } from '../utils/localPersistence';
+import { deleteToken, generateToken, saveToken } from '../utils/localPersistence';
 import UserService from '../services/users';
 import { compare } from '../utils/hash';
-configDotenv();
+import { errorMessages, handleError } from '../app/errors';
 
 const router = express.Router();
 const userService = new UserService();
@@ -14,21 +11,21 @@ router.get('/login', (_, res) => {
     res.send('In Login Page');
 })
 
-router.post('/login', (req, res) : any => {
-    const { username, password } = req.body;
+router.post('/login', async (req, res) => {
+    const { email, username, password } = req.body;
+    const searchObject = email ? { email } : { name:username };
 
-    userService.getBy({name: username}).then(user => {
-        if(user === null || !compare(password, user?.password))
-            return res.send('Usuario o contraseña incorrectos').status(401);
-        
-        const token = jwt.sign({ username: hardcodedUser.name }, process.env.TOKEN_SECRET_KEY as string, {
-            expiresIn: '1h',
-        });
-    
-        req.headers.authorization = `Bearer ${token}`;
-        saveToken(token, res);
+    try {
+        const user = await userService.getBy(searchObject);
+
+        if (!user || !(await compare(password, user.password)))
+            return handleError(res, null, errorMessages.invalidCredentials, 401);
+
+        const token = generateToken(searchObject);
         res.json({ token });
-    })
+    } catch (err) {
+        handleError(res, err, errorMessages.serverError);
+    }
 });
 
 router.post('/logout', (_, res) => {

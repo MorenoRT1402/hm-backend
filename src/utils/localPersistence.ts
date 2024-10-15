@@ -1,6 +1,11 @@
+import { configDotenv } from "dotenv";
 import { Request, Response } from "express";
+import jwt from 'jsonwebtoken';
+configDotenv();
 
 const tokenKey = 'hm-b-t';
+
+export const generateToken = (payload:{}) => jwt.sign(payload, process.env.TOKEN_SECRET_KEY as string, { expiresIn: '1h' });
 
 export const saveToken = (token:string, res:Response):void => {
     res.cookie(tokenKey, token, {

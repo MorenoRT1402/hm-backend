@@ -8,6 +8,7 @@ export interface AppUser {
 
 export const hardcodedAppUser = {
     username: 'admin',
+    email: 'admin@gmail.com',
     password: '1234'
 }
 
@@ -15,7 +16,7 @@ export const hardcodedUser : UserInput = {
     name: hardcodedAppUser.username,
     picture: 'http://dummyimage.com/123x100.png/cc0000/ffffff',
     position: 'Manager',
-    email: 'hardcoded@user.com',
+    email: hardcodedAppUser.email,
     contact: '691 314 8012',
     joined: '2023-10-09 12:12:19',
     jobDesk: 'Offer restaurant and activity recommendations and assist guests in arranging transportation',

@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { bookingParams } from '../../app/hotelParams';
-import { Types } from 'mongoose';
 import { BookingStatus } from '../../interfaces/booking';
 import random from '../../utils/random';
 import { RoomModel } from '../../db/schemas/roomSchema';
