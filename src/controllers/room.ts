@@ -135,7 +135,6 @@ router.post('/', authMiddleware, async (req, res) => {
  *         description: Room not found
  */
 router.put('/:id', authMiddleware, async (req, res) => {
-    console.log(req.params.id)
     const updateRoom = await roomService.update(req.params.id, req.body);
     if (updateRoom) {
         res.status(200).send(updateRoom);

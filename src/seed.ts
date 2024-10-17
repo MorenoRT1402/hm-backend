@@ -31,8 +31,6 @@ const saveFakeData = async <T>(fakeItem: () => Promise<T> | T, model: Model<T>) 
     }
     await model.insertMany(fakeDatas);
   };
-  
-  
 
 const saveFakeDatas = async() => {
   const adminUser = new UserModel(hardcodedUser);

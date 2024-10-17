@@ -8,6 +8,7 @@ import userRouter from './controllers/user';
 import contactRouter from './controllers/contact';
 import { swaggerSetup } from './documentation/swagger';
 import cors from 'cors';
+import { endpoints } from './app/api';
 
 const app = express();
 
@@ -19,11 +20,11 @@ app.use(cookieParser());
 swaggerSetup(app);
 
 // Rutas
-app.use('/auth', authRouter);
-app.use('/bookings', bookingRouter);
-app.use('/rooms', roomRouter);
-app.use('/users', userRouter);
-app.use('/contacts', contactRouter);
+app.use(`/${endpoints.auth}`, authRouter);
+app.use(`/${endpoints.booking}`, bookingRouter);
+app.use(`/${endpoints.rooms}`, roomRouter);
+app.use(`/${endpoints.users}`, userRouter);
+app.use(`/${endpoints.contacts}`, contactRouter);
 app.use('/', publicRouter);
 
 export default app;

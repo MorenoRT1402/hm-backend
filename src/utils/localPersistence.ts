@@ -5,7 +5,7 @@ configDotenv();
 
 const tokenKey = 'hm-b-t';
 
-export const generateToken = (payload:{}) => jwt.sign(payload, process.env.TOKEN_SECRET_KEY as string, { expiresIn: '1h' });
+export const generateToken = (payload:{}) => jwt.sign(payload, process.env.TOKEN_SECRET_KEY as string, { expiresIn: '24h' });
 
 export const saveToken = (token:string, res:Response):void => {
     res.cookie(tokenKey, token, {
