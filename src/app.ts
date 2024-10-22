@@ -19,7 +19,7 @@ app.use(cookieParser());
 // Initialize Swagger
 swaggerSetup(app);
 
-// Rutas
+// Routes
 app.use(`/${endpoints.auth}`, authRouter);
 app.use(`/${endpoints.booking}`, bookingRouter);
 app.use(`/${endpoints.rooms}`, roomRouter);
