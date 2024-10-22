@@ -1,12 +1,11 @@
 import { configDotenv } from "dotenv";
-import mongoose from "mongoose";
-import { IDatabase } from "./IDatabase";
 import { DatabaseFactory } from "./DatabaseFactory";
 
 configDotenv();
 
 const dbType = process.env.DB_TYPE || "mongo";
-const database: IDatabase = DatabaseFactory.createDatabase(dbType);
+export const getDatabase = () => DatabaseFactory.createDatabase(dbType);
+const database = getDatabase();
 
 export const connectToDB = async () => {
     try {
