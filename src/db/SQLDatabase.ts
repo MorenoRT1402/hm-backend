@@ -107,9 +107,115 @@ export class SqlDatabase implements IDatabase {
         console.log("All tables dropped");
     }
 
-    async createTables(): Promise<void> {
-
+    async createTable(tableName: string, headers: { key: string, type: string, nullable?: boolean, unique?: boolean, primary?: boolean, foreign?: { table: string, ref: string } }[]): Promise<void> {
+        const columns = headers.map(header => {
+            let columnDef = `${header.key} ${header.type}`;
+    
+            const constraints = [
+                !header.nullable ? 'NOT NULL' : '',
+                header.unique ? 'UNIQUE' : '',
+                header.primary ? 'PRIMARY KEY' : ''
+            ].filter(Boolean).join(' ');
+    
+            columnDef += constraints ? ` ${constraints}` : '';
+    
+            if (header.foreign) {
+                columnDef += `, FOREIGN KEY (${header.key}) REFERENCES ${header.foreign.table}(${header.foreign.ref})`;
+            }
+    
+            return columnDef;
+        });
+    
+        const createTableQuery = `
+            CREATE TABLE IF NOT EXISTS ${tableName} (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                ${columns.join(', ')}
+            );
+        `;
+    
+        try {
+            await this.pool.query(createTableQuery);
+            console.log(`Table ${tableName} created successfully`);
+        } catch (error) {
+            console.error(`Error creating table ${tableName}:`, error);
+        }
     }
+    
+    
+
+    async createTables(): Promise<void> {
+        const createUsersTable = `
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                picture VARCHAR(255),
+                position VARCHAR(255),
+                email VARCHAR(255) NOT NULL UNIQUE,
+                contact VARCHAR(50),
+                joined DATE,
+                jobDesk VARCHAR(255),
+                schedule JSON,
+                status VARCHAR(50),
+                password VARCHAR(255) NOT NULL
+            );
+        `;
+    
+        const createRoomsTable = `
+            CREATE TABLE IF NOT EXISTS rooms (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                dateAdded DATE,
+                roomType VARCHAR(255),
+                number INT,
+                picture VARCHAR(255),
+                bedType VARCHAR(50),
+                roomFloor INT,
+                facilities JSON,
+                rate DECIMAL(10, 2),
+                discount DECIMAL(5, 2),
+                status VARCHAR(50)
+            );
+        `;
+    
+        const createContactsTable = `
+            CREATE TABLE IF NOT EXISTS contacts (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                date DATE,
+                customer VARCHAR(255),
+                email VARCHAR(255),
+                phone VARCHAR(50),
+                subject VARCHAR(255),
+                comment TEXT,
+                archived BOOLEAN DEFAULT FALSE
+            );
+        `;
+    
+        const createBookingsTable = `
+            CREATE TABLE IF NOT EXISTS bookings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                guest VARCHAR(255),
+                picture VARCHAR(255),
+                orderDate DATE,
+                checkIn DATE,
+                checkOut DATE,
+                discount DECIMAL(5, 2),
+                notes TEXT,
+                room INT,
+                status VARCHAR(50),
+                FOREIGN KEY (room) REFERENCES rooms(id)
+            );
+        `;
+    
+        try {
+            // Ejecutar las consultas para crear las tablas
+            await this.pool.query(createUsersTable);
+            await this.pool.query(createRoomsTable);
+            await this.pool.query(createContactsTable);
+            await this.pool.query(createBookingsTable);
+            console.log("Tables created successfully");
+        } catch (error) {
+            console.error("Error creating tables:", error);
+        }
+    }    
 
     private async saveFakeData<T>(fakeItem: () => Promise<T> | T, tableName: string, columns: string[]) {
         const valuesPlaceholder = columns.map(() => '?').join(', ');
