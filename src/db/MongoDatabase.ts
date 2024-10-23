@@ -95,4 +95,6 @@ export class MongoDatabase implements IDatabase {
         await this.saveFakeData(fakeContact, ContactModel);
         await this.saveFakeData(fakeBooking, BookingModel);
     }
+
+    getItemID (item:any): any { return item._id};
 }

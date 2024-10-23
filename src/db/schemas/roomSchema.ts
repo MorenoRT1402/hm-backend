@@ -9,7 +9,7 @@ const RoomSchema = new Schema<RoomInput>({
     bedType: String,
     roomFloor: String,
     facilities: [String],
-    rate: String,
+    rate: Number,
     discount: Number,
     status: String
 })

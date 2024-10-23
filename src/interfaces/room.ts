@@ -10,7 +10,7 @@ export interface Room {
     "bedType": string,
     "roomFloor": string,
     "facilities": string[],
-    "rate": string,
+    "rate": number,
     "discount": number,
     "status": RoomStatus
 }

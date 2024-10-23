@@ -7,6 +7,9 @@ import { fakeUser } from "../data/fake/users";
 import { fakeRoom } from "../data/fake/rooms";
 import { fakeContact } from "../data/fake/contacts";
 import { fakeBooking } from "../data/fake/bookings";
+import { SQLTableInterface, tables, tablesEnum } from "../app/sqlTables.data";
+import { UserModel } from "./schemas/userSchema";
+import { getTableName } from "../app/sqlTables.utils";
 
 export class SqlDatabase implements IDatabase {
     private pool: Pool;
@@ -29,7 +32,8 @@ export class SqlDatabase implements IDatabase {
     }
 
     private async SelectQuery<T>(model: Model<T>, conditions?: string, values?: any[]): Promise<T[]> {
-        let query = `SELECT * FROM ${model.modelName.toLowerCase()}`;
+        const tableName = getTableName(tables, model);
+        let query = `SELECT * FROM ${tableName}`;
         if (conditions) query += ` WHERE ${conditions}`;
         
         const [rows] = await this.pool.query(query, values || []);
@@ -55,21 +59,27 @@ export class SqlDatabase implements IDatabase {
     }
 
     async create<T>(model: Model<T>, itemInput: Partial<T>): Promise<T> {
-        const tableName = model.modelName.toLowerCase();
-        const keys = Object.keys(itemInput);
-        const values = Object.values(itemInput);
+        const tableName = getTableName(tables, model);
+        
+        const keys = Object.keys(itemInput).filter(key => key !== 'id');
+        
+        const values = keys.map(key => {
+            const value = (itemInput as any)[key];
+            return Array.isArray(value) ? JSON.stringify(value) : value;
+        });
+        
         const placeholders = keys.map(() => '?').join(', ');
-
+    
         const [result] = await this.pool.query(
             `INSERT INTO ${tableName} (${keys.join(', ')}) VALUES (${placeholders})`,
             values
         );
-
-        // MySQL doesn't have RETURNING, so we get the last inserted ID
+    
         const insertedId = (result as any).insertId;
         const [rows] = await this.pool.query(`SELECT * FROM ${tableName} WHERE id = ?`, [insertedId]);
         return (rows as T[])[0];
     }
+    
 
     async update<T>(model: Model<T>, id: string, updatedItem: Partial<T>): Promise<T | null> {
         const tableName = model.modelName.toLowerCase();
@@ -100,39 +110,43 @@ export class SqlDatabase implements IDatabase {
         `);
     
         for (const table of tables as any[]) {
-            const tableName = table['table_name'];
+            const tableName = table.TABLE_NAME;
             console.log(`Dropping table: ${tableName}`);
             await this.pool.query(`DROP TABLE IF EXISTS \`${tableName}\`;`);
         }
         console.log("All tables dropped");
     }
 
-    async createTable(tableName: string, headers: { key: string, type: string, nullable?: boolean, unique?: boolean, primary?: boolean, foreign?: { table: string, ref: string } }[]): Promise<void> {
-        const columns = headers.map(header => {
-            let columnDef = `${header.key} ${header.type}`;
-    
-            const constraints = [
-                !header.nullable ? 'NOT NULL' : '',
-                header.unique ? 'UNIQUE' : '',
-                header.primary ? 'PRIMARY KEY' : ''
-            ].filter(Boolean).join(' ');
-    
-            columnDef += constraints ? ` ${constraints}` : '';
-    
-            if (header.foreign) {
-                columnDef += `, FOREIGN KEY (${header.key}) REFERENCES ${header.foreign.table}(${header.foreign.ref})`;
-            }
-    
-            return columnDef;
-        });
-    
+    async createTable(table: SQLTableInterface): Promise<void> {
+        const tableName = table.tableName;
+        
+        const columns = [
+            'id INT NOT NULL UNIQUE auto_increment PRIMARY KEY',
+            ...table.headers.map(header => {
+                let columnDef = `${header.key} ${header.type}`;
+                
+                const constraints = [
+                    !header.nullable ? 'NOT NULL' : '',
+                    header.unique ? 'UNIQUE' : '',
+                    header.default ? `DEFAULT ${header.default}` : ''
+                ].filter(Boolean).join(' ');
+        
+                columnDef += constraints ? ` ${constraints}` : '';
+        
+                if (header.foreign) {
+                    columnDef += `, FOREIGN KEY (${header.key}) REFERENCES ${header.foreign.table}(${header.foreign.ref})`;
+                }
+        
+                return columnDef;
+            })
+        ];
+        
         const createTableQuery = `
             CREATE TABLE IF NOT EXISTS ${tableName} (
-                id INT AUTO_INCREMENT PRIMARY KEY,
                 ${columns.join(', ')}
             );
         `;
-    
+        
         try {
             await this.pool.query(createTableQuery);
             console.log(`Table ${tableName} created successfully`);
@@ -142,127 +156,50 @@ export class SqlDatabase implements IDatabase {
     }
     
     
-
     async createTables(): Promise<void> {
-        const createUsersTable = `
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                picture VARCHAR(255),
-                position VARCHAR(255),
-                email VARCHAR(255) NOT NULL UNIQUE,
-                contact VARCHAR(50),
-                joined DATE,
-                jobDesk VARCHAR(255),
-                schedule JSON,
-                status VARCHAR(50),
-                password VARCHAR(255) NOT NULL
-            );
-        `;
-    
-        const createRoomsTable = `
-            CREATE TABLE IF NOT EXISTS rooms (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                dateAdded DATE,
-                roomType VARCHAR(255),
-                number INT,
-                picture VARCHAR(255),
-                bedType VARCHAR(50),
-                roomFloor INT,
-                facilities JSON,
-                rate DECIMAL(10, 2),
-                discount DECIMAL(5, 2),
-                status VARCHAR(50)
-            );
-        `;
-    
-        const createContactsTable = `
-            CREATE TABLE IF NOT EXISTS contacts (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                date DATE,
-                customer VARCHAR(255),
-                email VARCHAR(255),
-                phone VARCHAR(50),
-                subject VARCHAR(255),
-                comment TEXT,
-                archived BOOLEAN DEFAULT FALSE
-            );
-        `;
-    
-        const createBookingsTable = `
-            CREATE TABLE IF NOT EXISTS bookings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                guest VARCHAR(255),
-                picture VARCHAR(255),
-                orderDate DATE,
-                checkIn DATE,
-                checkOut DATE,
-                discount DECIMAL(5, 2),
-                notes TEXT,
-                room INT,
-                status VARCHAR(50),
-                FOREIGN KEY (room) REFERENCES rooms(id)
-            );
-        `;
-    
         try {
-            // Ejecutar las consultas para crear las tablas
-            await this.pool.query(createUsersTable);
-            await this.pool.query(createRoomsTable);
-            await this.pool.query(createContactsTable);
-            await this.pool.query(createBookingsTable);
+            for (const table of tables)
+                await this.createTable(table);
             console.log("Tables created successfully");
         } catch (error) {
             console.error("Error creating tables:", error);
         }
-    }    
+    }
 
-    private async saveFakeData<T>(fakeItem: () => Promise<T> | T, tableName: string, columns: string[]) {
-        const valuesPlaceholder = columns.map(() => '?').join(', ');
-        const fakeDatas = [];
-
+    private async saveFakeData<T>(fakeItem: () => Promise<T> | T, tableEnum: tablesEnum) {
+        const tableConfig = tables.find(table => table.tableName === tableEnum);
+        if (!tableConfig) {
+            console.error(`Table configuration not found for enum: ${tableEnum}`);
+            return;
+        }
+    
+        const model = tableConfig.model;
+        let saves = 0;
+    
         for (let i = 0; i < GENERATION_NUMBER; i++) {
             try {
                 const itemData = await fakeItem();
-                const values = columns.map(col => (itemData as any)[col]);
-                fakeDatas.push(values);
+                await this.create(model, itemData as Partial<T>);
+                saves++;
             } catch (error) {
-                console.error(`Error saving item to ${tableName}:`, error);
+                console.error(`Error saving item to ${tableEnum}:`, error);
             }
         }
-
-        const query = `INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${valuesPlaceholder})`;
-        await this.pool.query(query, fakeDatas);
+    
+        console.log(`Saved ${saves} items to table ${tableEnum}.`);
     }
+    
 
     async saveFakeDatas(): Promise<void> {
         await this.createTables();
 
-        const adminUserQuery = `
-            INSERT INTO users (name, picture, position, email, contact, joined, jobDesk, schedule, status, password) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-        await this.pool.query(adminUserQuery, [
-            hardcodedUser.name, hardcodedUser.picture, hardcodedUser.position, hardcodedUser.email,
-            hardcodedUser.contact, hardcodedUser.joined, hardcodedUser.jobDesk, JSON.stringify(hardcodedUser.schedule),
-            hardcodedUser.status, hardcodedUser.password
-        ]);
+        await this.create(UserModel, hardcodedUser);
 
-        await this.saveFakeData(fakeUser, 'users', [
-            'name', 'picture', 'position', 'email', 'contact', 'joined', 'jobDesk', 'schedule', 'status', 'password'
-        ]);
-
-        await this.saveFakeData(fakeRoom, 'rooms', [
-            'dateAdded', 'roomType', 'number', 'picture', 'bedType', 'roomFloor', 'facilities', 'rate', 'discount', 'status'
-        ]);
-
-        await this.saveFakeData(fakeContact, 'contacts', [
-            'date', 'customer', 'email', 'phone', 'subject', 'comment', 'archived'
-        ]);
-
-        await this.saveFakeData(fakeBooking, 'bookings', [
-            'guest', 'picture', 'orderDate', 'checkIn', 'checkOut', 'discount', 'notes', 'room', 'status'
-        ]);
+        await this.saveFakeData(fakeUser, tablesEnum.Users);
+        await this.saveFakeData(fakeRoom, tablesEnum.Rooms);
+        await this.saveFakeData(fakeContact, tablesEnum.Contacts);
+        await this.saveFakeData(fakeBooking, tablesEnum.Bookings);
     }
     
+    getItemID(item:any): any {return item.id};
 }

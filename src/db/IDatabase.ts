@@ -13,5 +13,7 @@ export interface IDatabase {
 
   dropDatabase(): Promise<void>;
   saveFakeDatas(): Promise<void>;
+
+  getItemID: any
 }
   

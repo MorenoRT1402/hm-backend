@@ -1,9 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { userParams } from '../../app/hotelParams';
-import { UserStatus } from '../../interfaces/user';
+import { UserInput, UserStatus } from '../../interfaces/user';
 import { hash } from '../../utils/hash';
+import { formatToSQLDate } from '../../utils/dates';
 
-export const fakeUser = () => {
+export const fakeUser = () :UserInput => {
 
   return{
     name: faker.internet.userName(),
@@ -11,7 +12,7 @@ export const fakeUser = () => {
     position: faker.helpers.arrayElement(userParams.positions),
     email: faker.internet.email(),
     contact: faker.phone.number(),
-    joined: faker.date.past().toUTCString(),
+    joined: formatToSQLDate(faker.date.past()),
     jobDesk: faker.helpers.arrayElement(userParams.jobDesks),
     schedule: faker.helpers.arrayElements(userParams.schedules, 2),
     status: faker.helpers.enumValue(UserStatus),
