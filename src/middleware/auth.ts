@@ -13,7 +13,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         console.error(err)
         return res.status(403).json({ error: err });
       }
-      req.body.user = user;
+//      req.body.user = user;
       next();
     });
     

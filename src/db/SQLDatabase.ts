@@ -31,8 +31,9 @@ export class SqlDatabase implements IDatabase {
         await this.pool.end();
     }
 
+    //#region CRUD
     private async SelectQuery<T>(model: Model<T>, conditions?: string, values?: any[]): Promise<T[]> {
-        const tableName = getTableName(tables, model);
+        const tableName = getTableName(model);
         let query = `SELECT * FROM ${tableName}`;
         if (conditions) query += ` WHERE ${conditions}`;
         
@@ -59,7 +60,7 @@ export class SqlDatabase implements IDatabase {
     }
 
     async create<T>(model: Model<T>, itemInput: Partial<T>): Promise<T> {
-        const tableName = getTableName(tables, model);
+        const tableName = getTableName(model);
         
         const keys = Object.keys(itemInput).filter(key => key !== 'id');
         
@@ -82,7 +83,7 @@ export class SqlDatabase implements IDatabase {
     
 
     async update<T>(model: Model<T>, id: string, updatedItem: Partial<T>): Promise<T | null> {
-        const tableName = model.modelName.toLowerCase();
+        const tableName = getTableName(model);
         const keys = Object.keys(updatedItem);
         const values = Object.values(updatedItem);
         const setClause = keys.map((key) => `${key} = ?`).join(', ');
@@ -97,11 +98,13 @@ export class SqlDatabase implements IDatabase {
     }
 
     async remove<T>(model: Model<T>, id: string): Promise<boolean> {
-        const tableName = model.modelName.toLowerCase();
+        const tableName = getTableName(model);
         const [result] = await this.pool.query(`DELETE FROM ${tableName} WHERE id = ?`, [id]);
         return (result as any).affectedRows > 0;
     }
+    //#endregion
 
+    //#region SEED
     async dropDatabase(): Promise<void> {
         const [tables] = await this.pool.query(`
             SELECT table_name 
@@ -200,6 +203,9 @@ export class SqlDatabase implements IDatabase {
         await this.saveFakeData(fakeContact, tablesEnum.Contacts);
         await this.saveFakeData(fakeBooking, tablesEnum.Bookings);
     }
+    //#endregion
     
+    //#region AUX
     getItemID(item:any): any {return item.id};
+    //#endregion
 }

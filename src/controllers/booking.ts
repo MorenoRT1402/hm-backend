@@ -99,8 +99,12 @@ router.get('/:id', authMiddleware, async (req, res) => {
  *         description: Unauthorized
  */
 router.post('/', authMiddleware, async (req, res) => {
-    const newBooking = await bookingService.create(req.body);
-    res.status(201).send(newBooking);
+    try {
+        const newBooking = await bookingService.create(req.body);
+        res.status(201).send(newBooking);
+    } catch (error) {
+        res.send(error).status(500)
+    }
 });
 
 /**

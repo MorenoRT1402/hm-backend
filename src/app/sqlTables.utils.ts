@@ -1,4 +1,4 @@
 import { Model } from "mongoose";
-import { SQLTableInterface } from "./sqlTables.data";
+import { SQLTableInterface, tables } from "./sqlTables.data";
 
-export const getTableName = (tables:SQLTableInterface[], model:Model<any>) => tables.find(table => table.model === model)?.tableName;
+export const getTableName = (model:Model<any>) => tables.find(table => table.model === model)?.tableName;
